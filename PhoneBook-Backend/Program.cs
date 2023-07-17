@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhoneBook_Backend.Data;
+using PhoneBook_Backend.Repository;
+using PhoneBook_Backend.Repository.IRepository;
 using PhoneBook_Backend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,13 +56,14 @@ builder.Services.AddIdentityCore<IdentityUser>(options => {
     options.Password.RequireLowercase = false;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<UserManager<IdentityUser>>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters()
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -73,6 +76,9 @@ builder.Services
             )
         };
     });
+
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 

@@ -9,7 +9,7 @@ namespace PhoneBook_Backend.Utilities;
 
 public class JwtService
     {
-        private const int EXPIRATION_MINUTES = 1;
+        private const int EXPIRATION_MINUTES = 10;
 
         private readonly IConfiguration _configuration;
 
