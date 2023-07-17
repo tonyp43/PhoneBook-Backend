@@ -12,10 +12,12 @@ public class UserController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly JwtService _jwtService;
+    private readonly IMailService _mailService;
 
-    public UserController(UserManager<IdentityUser> userManager, JwtService jwtService) {
+    public UserController(UserManager<IdentityUser> userManager, JwtService jwtService, IMailService mailService) {
         _userManager = userManager;
         _jwtService = jwtService;
+        _mailService = mailService;
     }
     
     [HttpPost]
@@ -35,6 +37,8 @@ public class UserController : ControllerBase
         {
             return BadRequest(result.Errors);
         }
+        
+        WelcomeEmail(user.Email, user.UserName);
 
         user.Password = null;
         return CreatedAtAction("GetUser", new { username = user.UserName }, user);
@@ -83,5 +87,14 @@ public class UserController : ControllerBase
         var token = _jwtService.CreateToken(user);
 
         return Ok(token);
+    }
+
+    private void WelcomeEmail(string email, string name)
+    {
+        MailRequest mailRequest = new MailRequest();
+        mailRequest.ToEmail = email;
+        mailRequest.Subject = "Welcome to Phonebook Application!";
+        mailRequest.Body = "Thank you for registering to this Phonebook application, " + name + "!";
+        _mailService.SendEmailAsync(mailRequest);
     }
 }

@@ -20,20 +20,7 @@ public class ContactController : ControllerBase
         _userManager = userManager;
         _unitOfWork = unitOfWork;
     }
-    
-    [HttpGet("TestGet")]
-    public IActionResult TestGet()
-    {
-        return Ok();
-    }
-    
-    [Authorize]
-    [HttpGet("TestGetAuthorization")]
-    public IActionResult TestGetAuthorization()
-    {
-        return Ok();
-    }
-    
+
     [Authorize]
     [HttpPost("CreateContact")]
     public async Task<IActionResult> CreateContact(ContactDTO contactDto)
@@ -67,21 +54,110 @@ public class ContactController : ControllerBase
         _unitOfWork.Save();
         return Ok(contact);
     }
+
+    [Authorize]
+    [HttpDelete("DeleteContact")]
+    public async Task<IActionResult> DeleteContact(int id)
+    {
+        ClaimsPrincipal activeUser = HttpContext.User;
+        IdentityUser user = await _userManager.FindByNameAsync(activeUser.Identity.Name);
+     
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        
+        var contactToBeDeleted = _unitOfWork.Contact.Get(u=>u.Id==id);
+
+        if (GetOwnership(user, contactToBeDeleted))
+        {
+            _unitOfWork.Contact.Delete(contactToBeDeleted);
+            _unitOfWork.Save();
+            
+            return Ok(new { success = true, message = "Delete Successful" });
+        }
+
+        return BadRequest();
+    }
+
+    [Authorize]
+    [HttpGet("GetContacts")]
+    public async Task<IActionResult> GetContacts()
+    {
+        ClaimsPrincipal activeUser = HttpContext.User;
+        IdentityUser user = await _userManager.FindByNameAsync(activeUser.Identity.Name);
+        
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var contacts = _unitOfWork.Contact.GetAll(includeProperties: "User").Where(c => c.UserId == user.Id);
+        
+        return Ok(contacts);
+    }
     
     [Authorize]
-    [HttpPost("AuthTest")]
-    public async Task<IActionResult> AuthTest()
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Contact>> GetContact(int id)
     {
-
-        
         ClaimsPrincipal activeUser = HttpContext.User;
-        // Get the currently authenticated user
-        if (activeUser.Identity.IsAuthenticated)
+        IdentityUser user = await _userManager.FindByNameAsync(activeUser.Identity.Name);
+        
+        if (user == null)
         {
-            Console.WriteLine("Current user is " + activeUser.Identity.Name);
-            return Ok();
-            
+            return Unauthorized();
         }
-        return Unauthorized();
+
+        var contact = _unitOfWork.Contact.Get(u=>u.Id==id);
+
+        if (!GetOwnership(user, contact))
+        {
+            return BadRequest();
+        }
+
+        return contact;
+    }
+    
+    [Authorize]
+    [HttpPost("Update")]
+    public async Task<ActionResult<Contact>> Update(int id, ContactDTO contactDto)
+    {
+        ClaimsPrincipal activeUser = HttpContext.User;
+        IdentityUser user = await _userManager.FindByNameAsync(activeUser.Identity.Name);
+        
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var contact = _unitOfWork.Contact.Get(u=>u.Id==id);
+
+        if (!GetOwnership(user, contact))
+        {
+            return BadRequest();
+        }
+
+        contact.FirstName = contactDto.FirstName;
+        contact.LastName = contactDto.LastName;
+        contact.Email = contactDto.Email;
+        contact.PhoneNumber = contactDto.PhoneNumber;
+        contact.SocialNetworkLink = contactDto.SocialNetworkLink;
+
+        _unitOfWork.Contact.Update(contact);
+        _unitOfWork.Save();
+
+        return Ok();
+    }
+
+    //Determine if the user has ownership of the specified target
+    private bool GetOwnership(IdentityUser caller, Contact target)
+    {
+        if (target.UserId == caller.Id)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
