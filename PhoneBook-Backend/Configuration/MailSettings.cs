@@ -1,4 +1,4 @@
-namespace PhoneBook_Backend.Services;
+namespace PhoneBook_Backend.Configuration;
 
 public class MailSettings
 {

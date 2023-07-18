@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PhoneBook_Backend.Configuration;
 using PhoneBook_Backend.Data;
 using PhoneBook_Backend.Repository;
 using PhoneBook_Backend.Repository.IRepository;
