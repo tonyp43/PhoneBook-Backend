@@ -101,6 +101,13 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors(options =>
+{
+    options.WithOrigins("http://localhost:5173")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+});
+
 app.MapControllers();
 
 app.Run();

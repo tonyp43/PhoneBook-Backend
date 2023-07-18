@@ -27,7 +27,7 @@ namespace PhoneBook_Backend.Controllers
                 return BadRequest(ModelState);
             }
 
-            return CreatedAtAction("GetUser", new { username = createdUser.UserName }, createdUser);
+            return Ok();
         }
 
         [Authorize]
