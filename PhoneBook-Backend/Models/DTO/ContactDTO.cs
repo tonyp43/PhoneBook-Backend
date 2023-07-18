@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PhoneBook_Backend.Models;
+namespace PhoneBook_Backend.Models.DTO;
 
 public class ContactDTO
 {

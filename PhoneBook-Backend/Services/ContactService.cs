@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using PhoneBook_Backend.Models;
+using PhoneBook_Backend.Models.DTO;
 using PhoneBook_Backend.Repository.IRepository;
 using PhoneBook_Backend.Services.IServices;
 
@@ -23,6 +24,7 @@ public class ContactService : IContactService
             Email = contactDto.Email,
             PhoneNumber = contactDto.PhoneNumber,
             SocialNetworkLink = contactDto.SocialNetworkLink,
+            Deleted = false,
             UserId = user.Id,
             User = user
         };
@@ -35,11 +37,13 @@ public class ContactService : IContactService
 
     public async Task<bool> DeleteContact(int id, IdentityUser user)
     {
-        var contactToBeDeleted = _unitOfWork.Contact.Get(u => u.Id == id);
+        var contactToBeDeleted = _unitOfWork.Contact.Get(u => (u.Id == id) && (u.Deleted == false));
 
         if (GetOwnership(user, contactToBeDeleted))
         {
-            _unitOfWork.Contact.Delete(contactToBeDeleted);
+            //_unitOfWork.Contact.Delete(contactToBeDeleted);
+            contactToBeDeleted.Deleted = true;
+            _unitOfWork.Contact.Update(contactToBeDeleted);
             _unitOfWork.Save();
 
             return true;
@@ -51,15 +55,20 @@ public class ContactService : IContactService
     public async Task<IEnumerable<Contact>> GetContacts(IdentityUser user)
     {
         var contacts = _unitOfWork.Contact.GetAll(includeProperties: "User")
-            .Where(c => c.UserId == user.Id);
+            .Where(c => (c.UserId == user.Id) && (c.Deleted == false));
 
         return contacts;
     }
 
     public async Task<Contact> GetContact(int id, IdentityUser user)
     {
-        var contact = _unitOfWork.Contact.Get(u => u.Id == id);
+        var contact = _unitOfWork.Contact.Get(u => (u.Id == id) && (u.Deleted == false));
 
+        if (contact == null)
+        {
+            return null;
+        }
+        
         if (!GetOwnership(user, contact))
         {
             return null;
@@ -70,7 +79,12 @@ public class ContactService : IContactService
 
     public async Task<bool> UpdateContact(int id, ContactDTO contactDto, IdentityUser user)
     {
-        var contact = _unitOfWork.Contact.Get(u => u.Id == id);
+        var contact = _unitOfWork.Contact.Get(u => (u.Id == id) && (u.Deleted == false));
+
+        if (contact == null)
+        {
+            return false;
+        }
 
         if (!GetOwnership(user, contact))
         {

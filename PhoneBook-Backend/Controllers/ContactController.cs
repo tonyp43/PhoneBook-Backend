@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PhoneBook_Backend.Models;
+using PhoneBook_Backend.Models.DTO;
 using PhoneBook_Backend.Services;
 using PhoneBook_Backend.Services.IServices;
 

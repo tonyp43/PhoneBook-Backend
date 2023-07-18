@@ -20,6 +20,8 @@ public class Contact
 
     public string SocialNetworkLink { get; set; }
 
+    public bool Deleted { get; set; }
+
     public string UserId { get; set; }
     public IdentityUser User { get; set; }
 

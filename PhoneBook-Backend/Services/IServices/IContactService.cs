@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using PhoneBook_Backend.Models;
+using PhoneBook_Backend.Models.DTO;
 
 namespace PhoneBook_Backend.Services.IServices;
 
