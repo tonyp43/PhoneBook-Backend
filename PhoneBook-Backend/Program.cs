@@ -7,7 +7,8 @@ using Microsoft.OpenApi.Models;
 using PhoneBook_Backend.Data;
 using PhoneBook_Backend.Repository;
 using PhoneBook_Backend.Repository.IRepository;
-using PhoneBook_Backend.Utilities;
+using PhoneBook_Backend.Services;
+using PhoneBook_Backend.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +80,11 @@ builder.Services
 
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IContactService, ContactService>();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IMailService, MailService>();
 
 var app = builder.Build();
 

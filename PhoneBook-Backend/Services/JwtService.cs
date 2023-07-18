@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PhoneBook_Backend.Models;
 
-namespace PhoneBook_Backend.Utilities;
+namespace PhoneBook_Backend.Services;
 
 public class JwtService
     {

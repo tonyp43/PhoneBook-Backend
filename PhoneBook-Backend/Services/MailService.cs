@@ -3,8 +3,9 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using PhoneBook_Backend.Models;
+using PhoneBook_Backend.Services.IServices;
 
-namespace PhoneBook_Backend.Utilities;
+namespace PhoneBook_Backend.Services;
 
 public class MailService : IMailService
 {
