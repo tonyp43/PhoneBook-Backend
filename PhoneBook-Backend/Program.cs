@@ -103,7 +103,7 @@ app.UseAuthorization();
 
 app.UseCors(options =>
 {
-    options.WithOrigins("http://localhost:5173")
+    options.WithOrigins("http://localhost:5173") //TODO: Change if necessary
         .AllowAnyMethod()
         .AllowAnyHeader();
 });

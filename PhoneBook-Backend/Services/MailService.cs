@@ -28,18 +28,11 @@ public class MailService : IMailService
         
         if (mailRequest.Attachments != null)
         {
-            byte[] fileBytes;
-            foreach (var file in mailRequest.Attachments)
+            foreach (var file in mailRequest.Attachments.Where(file => file.Length > 0))
             {
-                if (file.Length > 0)
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        file.CopyTo(ms);
-                        fileBytes = ms.ToArray();
-                    }
-                    builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
-                }
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+                builder.Attachments.Add(file.FileName, ms.ToArray(), ContentType.Parse(file.ContentType));
             }
         }
         builder.HtmlBody = mailRequest.Body;
