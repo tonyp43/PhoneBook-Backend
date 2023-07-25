@@ -50,7 +50,7 @@ builder.Services.AddSwaggerGen(option =>
 // Configure user registration
 builder.Services.AddIdentityCore<IdentityUser>(options => {
     options.SignIn.RequireConfirmedAccount = false;
-    options.User.RequireUniqueEmail = true;
+    options.User.RequireUniqueEmail = false;
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;

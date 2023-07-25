@@ -20,11 +20,17 @@ namespace PhoneBook_Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            var existingUser = await _userService.GetUser(user.UserName);
+            if (existingUser != null)
+            {
+                return BadRequest("User with this name already exists");
+            }
+
             var createdUser = await _userService.CreateUser(user);
 
             if (createdUser == null)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid submission");
             }
 
             return Ok();
@@ -51,7 +57,7 @@ namespace PhoneBook_Backend.Controllers
 
             if (token == null)
             {
-                return BadRequest("Bad credentials");
+                return BadRequest("Invalid username or password");
             }
 
             return Ok(token);
